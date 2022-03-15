@@ -10,6 +10,7 @@
         }
 
         public event Action ProductsChanged;
+        public string Message { get; set; } = "Loading Products...";
         public List<Product> Products { get; set; } = new List<Product>();
 
         public async Task GetProductsAsync(string? categoryUrl = null)
@@ -27,6 +28,20 @@
         {
             var result = await _http.GetFromJsonAsync<ServiceResponse<Product>>($"api/products/{id}");
             return result;
+        }
+
+        public async Task SearchProducts(string searchText)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/products/search/{searchText}");
+            if (result != null && result.Data != null) Products = result.Data;
+            if (Products.Count == 0) Message = "No products found";
+            ProductsChanged.Invoke();
+        }
+
+        public async Task<List<string>> GetProductSearchSuggestions(string searchText)
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/products/search-suggestions/{searchText}");
+            return result.Data;
         }
     }
 }
