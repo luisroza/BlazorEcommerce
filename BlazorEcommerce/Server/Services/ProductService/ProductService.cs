@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Mvc;
-
-namespace BlazorEcommerce.Server.Services.ProductService
+﻿namespace BlazorEcommerce.Server.Services.ProductService
 {
     public class ProductService : IProductService
     {
@@ -15,21 +12,19 @@ namespace BlazorEcommerce.Server.Services.ProductService
         }
         public async Task<ServiceResponse<List<Product>>> GetProductsAsync()
         {
-            var response = new ServiceResponse<List<Product>>
+            return new ServiceResponse<List<Product>>
             {
                 Data = await _context.Products.Include(p => p.Variants).ToListAsync()
             };
-            return response;
         }
 
         public async Task<ServiceResponse<List<Product>>> GetProductsByCategoryAsync(string categoryUrl)
         {
-            var response = new ServiceResponse<List<Product>>()
+            return new ServiceResponse<List<Product>>()
             {
                 Data = await _context.Products.Where(p => p.Category!.Url.ToLower().Equals(categoryUrl.ToLower()))
                     .Include(p => p.Variants).ToListAsync()
             };
-            return response;
         }
 
         public async Task<ServiceResponse<Product>> GetProductAsync(int id)
@@ -79,14 +74,21 @@ namespace BlazorEcommerce.Server.Services.ProductService
             return new ServiceResponse<List<string>> { Data = result };
         }
 
+        public async Task<ServiceResponse<List<Product>>> GetFeaturedProducts()
+        {
+            return new ServiceResponse<List<Product>>()
+            {
+                Data = await _context.Products.Where(p => p.Featured)
+                    .Include(p => p.Variants).ToListAsync()
+            };
+        }
+
         public async Task<ServiceResponse<List<Product>>> SearchProducts(string searchText)
         {
-            var response = new ServiceResponse<List<Product>>
+            return new ServiceResponse<List<Product>>
             {
                 Data = await FindProductBySearchText(searchText)
             };
-
-            return response;
         }
 
         private async Task<List<Product>> FindProductBySearchText(string searchText)

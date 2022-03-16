@@ -5,10 +5,16 @@
 
 <PageTitle>My Shop</PageTitle>
 
-<ProductList />
+@if (string.IsNullOrEmpty(SearchText) && string.IsNullOrEmpty(CategoryUrl))
+{
+    <FeaturedProducts/>
+}
+else
+{
+    <ProductList />
+}
 
 @code {
-
     [Parameter]
     public string? CategoryUrl { get; set; } = null;
 

@@ -16,7 +16,7 @@
         public async Task GetProductsAsync(string? categoryUrl = null)
         {
             var result = categoryUrl == null
-                ? await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/products")
+                ? await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/products/featured")
                 : await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/products/categories/{categoryUrl}");
             if (result != null && result.Data != null)
                 Products = result.Data;

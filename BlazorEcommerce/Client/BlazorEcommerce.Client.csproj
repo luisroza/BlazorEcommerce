@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <None Remove="Pages\ProductDetails.razor.css" />
+    <None Remove="Shared\HomeButton.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Pages\ProductDetails.razor.css" />
+    <Content Include="Shared\HomeButton.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
