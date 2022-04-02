@@ -26,8 +26,12 @@ else
             </li>
         }
     </ul>
+    for (var i = 0; i <= _productService.PageCount; i++)
+    {
+        <a class="btn @(i == _productService.CurrentPage ? "btn-info" : "btn-outline-info")
+                    page-selection" href="/search/@_productService.LastSearchText/@i">@i</a>
+    }
 }
-
 
 @code {
     protected override void OnInitialized()
@@ -45,7 +49,7 @@ else
         var variants = product.Variants;
         if (variants.Count == 0)
             return string.Empty;
-        else if (variants.Count == 1)
+        if (variants.Count == 1)
             return $"${variants[0].Price}";
 
         decimal minPrice = variants.Min(v => v.Price);

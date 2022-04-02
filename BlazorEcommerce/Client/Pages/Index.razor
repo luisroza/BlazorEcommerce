@@ -1,5 +1,5 @@
 ﻿@page "/"
-@page "/search/{searchText}"
+@page "/search/{searchText}/{page:int}"
 @page "/{categoryUrl}"
 @inject IProductService _productService
 
@@ -21,10 +21,13 @@ else
     [Parameter]
     public string? SearchText { get; set; } = null;
 
+    [Parameter]
+    public int Page { get; set; } = 1;
+
     protected override async Task OnParametersSetAsync()
     {
         if (!string.IsNullOrEmpty(SearchText))
-            await _productService.SearchProducts(SearchText);
+            await _productService.SearchProducts(SearchText, Page);
         else
             await _productService.GetProductsAsync(CategoryUrl);
     }
