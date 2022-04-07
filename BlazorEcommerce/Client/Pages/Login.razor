@@ -1,0 +1,58 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.WebUtilities
+@inject IAuthService _authService
+@inject ILocalStorageService _localStorage
+@inject NavigationManager _navigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<PageTitle>Login</PageTitle>
+<h3>Login</h3>
+
+<EditForm Model="_user" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator/>
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="_user.Email" class="form-control"/>
+        <ValidationMessage For="(() => _user.Email)"/>
+    </div>
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="_user.Password" class="form-control" type="password"/>
+        <ValidationMessage For="(() => _user.Password)"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+<div class="text-danger">
+    <span>@_errorMessage</span>
+</div>
+
+@code {
+    private UserLogin _user = new UserLogin();
+    private string _errorMessage = string.Empty;
+    private string _returnUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
+        {
+            _returnUrl = url;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        var result = await _authService.Login(_user);
+        if (result.Success)
+        {
+            _errorMessage = string.Empty;
+            await _localStorage.SetItemAsync("authToken", result.Data);
+            await _authenticationStateProvider.GetAuthenticationStateAsync();
+            _navigationManager.NavigateTo(_returnUrl);
+        }
+        else
+        {
+            _errorMessage = result.Message;
+        }
+    }
+}

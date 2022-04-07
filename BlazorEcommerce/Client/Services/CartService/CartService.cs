@@ -17,10 +17,17 @@ namespace BlazorEcommerce.Client.Services.CartService
         public async Task AddToCart(CartItem cartItem)
         {
             var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart") ?? new List<CartItem>();
-            cart.Add(cartItem);
-            OnChanged?.Invoke();
+
+            var matchItem =
+                cart.Find(i => i.ProductId == cartItem.ProductId && i.ProductTypeId == cartItem.ProductTypeId);
+
+            if (matchItem == null)
+                cart.Add(cartItem);
+            else
+                matchItem.Quantity += cartItem.Quantity;
 
             await _localStorage.SetItemAsync("cart", cart);
+            OnChanged?.Invoke();
         }
 
         public async Task<List<CartItem>> GetCartItems()
@@ -47,6 +54,19 @@ namespace BlazorEcommerce.Client.Services.CartService
                 cart.Remove(cartItem);
                 await _localStorage.SetItemAsync("cart", cart);
                 OnChanged.Invoke();
+            }
+        }
+
+        public async Task UpdateQuantity(CartProductResponse product)
+        {
+            var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
+            if (cart == null) return;
+
+            var cartItem = cart.Find(p => p.ProductId == product.ProductId && p.ProductTypeId == product.ProductTypeId);
+            if (cartItem != null)
+            {
+                cartItem.Quantity = product.Quantity;
+                await _localStorage.SetItemAsync("cart", cart);
             }
         }
     }
