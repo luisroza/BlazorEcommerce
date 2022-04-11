@@ -2,6 +2,7 @@ global using BlazorEcommerce.Server.Data;
 global using BlazorEcommerce.Server.Services.AuthService;
 global using BlazorEcommerce.Server.Services.CartService;
 global using BlazorEcommerce.Server.Services.CategoryService;
+global using BlazorEcommerce.Server.Services.OrderService;
 global using BlazorEcommerce.Server.Services.ProductService;
 global using BlazorEcommerce.Shared;
 global using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -39,11 +41,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 app.UseSwaggerUI();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
@@ -51,7 +53,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

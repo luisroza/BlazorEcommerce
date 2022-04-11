@@ -12,7 +12,7 @@
 
         public async Task GetCategoriesAsync()
         {
-            var response = await _http.GetFromJsonAsync<ServiceResponse<List<Category>>>("api/categories");
+            var response = await _http.GetFromJsonAsync<ServiceResponse<List<Category>>>("api/category");
             if (response != null && response.Data != null)
                     Categories = response.Data;
         }

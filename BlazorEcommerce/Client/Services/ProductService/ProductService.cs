@@ -19,8 +19,8 @@
         public async Task GetProductsAsync(string? categoryUrl = null)
         {
             var result = categoryUrl == null
-                ? await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/products/featured")
-                : await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/products/categories/{categoryUrl}");
+                ? await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/product/featured")
+                : await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/product/categories/{categoryUrl}");
             if (result != null && result.Data != null)
                 Products = result.Data;
 
@@ -35,14 +35,14 @@
 
         public async Task<ServiceResponse<Product>> GetProductAsync(int id)
         {
-            var result = await _http.GetFromJsonAsync<ServiceResponse<Product>>($"api/products/{id}");
+            var result = await _http.GetFromJsonAsync<ServiceResponse<Product>>($"api/product/{id}");
             return result;
         }
 
         public async Task SearchProducts(string searchText, int page)
         {
             LastSearchText = searchText;
-            var result = await _http.GetFromJsonAsync<ServiceResponse<ProductSearchResult>>($"api/products/search/{searchText}/{page}");
+            var result = await _http.GetFromJsonAsync<ServiceResponse<ProductSearchResult>>($"api/product/search/{searchText}/{page}");
             if (result != null && result.Data != null)
             {
                 Products = result.Data.Products;
@@ -55,7 +55,7 @@
 
         public async Task<List<string>> GetProductSearchSuggestions(string searchText)
         {
-            var result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/products/search-suggestions/{searchText}");
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/search-suggestions/{searchText}");
             return result.Data;
         }
     }

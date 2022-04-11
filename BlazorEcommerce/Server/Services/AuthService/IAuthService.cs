@@ -8,5 +8,6 @@ namespace BlazorEcommerce.Server.Services.AuthService
         Task<bool> UserExists(string email);
         Task<ServiceResponse<string>> Login(string email, string password);
         Task<ServiceResponse<bool>> ChangePassword(Guid userId, string newPassword);
+        Guid GetUserId();
     }
 }
