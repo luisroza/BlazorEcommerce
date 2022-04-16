@@ -14,7 +14,7 @@
         {
             return new ServiceResponse<List<Product>>
             {
-                Data = await _context.Products.Include(p => p.Variants).ToListAsync()
+                Data = await _context.Products!.Include(p => p.Variants).ToListAsync()
             };
         }
 
@@ -22,7 +22,7 @@
         {
             return new ServiceResponse<List<Product>>()
             {
-                Data = await _context.Products.Where(p => p.Category!.Url.ToLower().Equals(categoryUrl.ToLower()))
+                Data = await _context.Products!.Where(p => p.Category!.Url.ToLower().Equals(categoryUrl.ToLower()))
                     .Include(p => p.Variants).ToListAsync()
             };
         }
@@ -30,7 +30,7 @@
         public async Task<ServiceResponse<Product>> GetProductAsync(int id)
         {
             var response = new ServiceResponse<Product>();
-            var product = await _context.Products.Include(p => p.Variants)
+            var product = await _context.Products!.Include(p => p.Variants)
                 .ThenInclude(v => v.ProductType).FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
@@ -78,7 +78,7 @@
         {
             return new ServiceResponse<List<Product>>()
             {
-                Data = await _context.Products.Where(p => p.Featured)
+                Data = await _context.Products!.Where(p => p.Featured)
                     .Include(p => p.Variants).ToListAsync()
             };
         }
@@ -87,7 +87,7 @@
         {
             var pageResults = 2f;
             var pageCount = Math.Ceiling((await FindProductBySearchText(searchText)).Count / pageResults);
-            var products = await _context.Products
+            var products = await _context.Products!
                 .Where(p => p.Title.ToLower().Contains(searchText.ToLower())
                             || p.Description.ToLower().Contains(searchText.ToLower()))
                 .Include(p => p.Variants)
@@ -106,7 +106,7 @@
 
         private async Task<List<Product>> FindProductBySearchText(string searchText)
         {
-            return await _context.Products
+            return await _context.Products!
                 .Where(p => p.Title.ToLower().Contains(searchText.ToLower())
                             || p.Description.ToLower().Contains(searchText.ToLower()))
                 .Include(p => p.Variants).ToListAsync();

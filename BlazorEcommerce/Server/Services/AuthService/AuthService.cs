@@ -32,7 +32,7 @@ namespace BlazorEcommerce.Server.Services.AuthService
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            _context.Users.Add(user);
+            _context.Users!.Add(user);
             await _context.SaveChangesAsync();
 
             return new ServiceResponse<Guid>()
@@ -44,13 +44,13 @@ namespace BlazorEcommerce.Server.Services.AuthService
 
         public async Task<bool> UserExists(string email)
         {
-            return await _context.Users.AnyAsync(u => u.Email.ToLower().Equals(email.ToLower()));
+            return await _context.Users!.AnyAsync(u => u.Email.ToLower().Equals(email.ToLower()));
         }
 
         public async Task<ServiceResponse<string>> Login(string email, string password)
         {
             var response = new ServiceResponse<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower().Equals(email.ToLower()));
+            var user = await _context.Users!.FirstOrDefaultAsync(u => u.Email.ToLower().Equals(email.ToLower()));
 
             if (user == null)
             {
@@ -93,7 +93,12 @@ namespace BlazorEcommerce.Server.Services.AuthService
             };
         }
 
-        public Guid GetUserId() => Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public Guid GetUserId() => Guid.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public string GetUserEmail() => _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Name);
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return (await _context.Users!.FirstOrDefaultAsync(user => user.Email.Equals(email)))!;
+        }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {

@@ -1,6 +1,8 @@
 ﻿@page "/cart"
 @inject ICartService _cartService
 @inject IOrderService _orderService
+@inject IAuthService _authService
+@inject NavigationManager _navigationManager
 
 <PageTitle>Shopping Cart</PageTitle>
 <h3>Shopping Cart</h3>
@@ -9,10 +11,6 @@
 {
     <span>@_message</span>
 }
-else if (_orderPlaced)
-{
-    <span>Thank you for your order! You can check your order <a href="orders">here</a>.</span>
-}
 else
 {
     <div>
@@ -20,7 +18,7 @@ else
         {
             <div class="container">
                 <div class="image-wrapper">
-                    <img src="@product.ImageUrl" class="image"/>
+                    <img src="@product.ImageUrl" class="image" alt="Product Image"/>
                 </div>
                 <div class="name">
                     <h5><a href="/product/@product.ProductId">@product.Title</a></h5>
@@ -36,17 +34,24 @@ else
             Total (@_cartProducts.Count): $@_cartProducts.Sum(p => @p.Price * p.Quantity)
         </div>
     </div>
-    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Place Order</button>
+    @if (_isAuthenticated)
+    {
+        <div>
+            <h5>Delivery Address</h5>
+            <AddressForm/>
+        </div>
+    }
+    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Checkout</button>
 }
 
 @code {
     List<CartProductResponse>? _cartProducts = null;
     string _message = "Loading cart...";
-    bool _orderPlaced = false;
+    bool _isAuthenticated = false;
 
     protected override async Task OnInitializedAsync()
     {
-        _orderPlaced = false;
+        _isAuthenticated = await _authService.IsUserAuthenticated();
         await LoadCart();
     }
 
@@ -77,8 +82,7 @@ else
 
     private async Task PlaceOrder()
     {
-        await _orderService.PlaceOrder();
-        await _cartService.GetCartItemsCount();
-        _orderPlaced = true;
+        var url = await _orderService.PlaceOrder();
+        _navigationManager.NavigateTo(url);
     }
 }

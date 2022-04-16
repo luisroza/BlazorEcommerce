@@ -62,8 +62,10 @@ namespace BlazorEcommerce.Client
             var jsonBytes = ParseBase64WithoutPadding(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-            var claims =   keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+            if (keyValuePairs == null) return new List<Claim>();
+            var claims =   keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString() ?? string.Empty));
             return claims;
+
         }
     }
 }

@@ -11,7 +11,7 @@
 
         public async Task<ServiceResponse<List<Category>>> GetCategoriesAsync()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories!.ToListAsync();
             return new ServiceResponse<List<Category>>
             {
                 Data = categories
@@ -21,7 +21,7 @@
         public async Task<ServiceResponse<Category>> GetCategoryAsync(int id)
         {
             var response = new ServiceResponse<Category>();
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories!.FindAsync(id);
             if (category == null)
             {
                 response.Success = false;
