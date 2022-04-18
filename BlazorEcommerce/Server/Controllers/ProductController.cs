@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers
 {
@@ -20,10 +21,10 @@ namespace BlazorEcommerce.Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<ServiceResponse<Product>>> GetProduct(int id)
+        [HttpGet("{productId:int}")]
+        public async Task<ActionResult<ServiceResponse<Product>>> GetProduct(int productId)
         {
-            var result = await _productService.GetProductAsync(id);
+            var result = await _productService.GetProductAsync(productId);
             if (result.Data == null)
                 return NotFound(result);
             return Ok(result);
@@ -54,6 +55,34 @@ namespace BlazorEcommerce.Server.Controllers
         public async Task<ActionResult<ServiceResponse<List<Product>>>> GetFeaturedProducts()
         {
             var result = await _productService.GetFeaturedProducts();
+            return Ok(result);
+        }
+
+        [HttpGet("admin"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<List<Product>>>> GetAdminProducts()
+        {
+            var result = await _productService.GetAdminProducts();
+            return Ok(result);
+        }
+
+        [HttpPost, Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<Product>>> CreateProduct(Product product)
+        {
+            var result = await _productService.CreateProduct(product);
+            return Ok(result);
+        }
+
+        [HttpPut, Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<Product>>> UpdateProduct(Product product)
+        {
+            var result = await _productService.UpdateProduct(product);
+            return Ok(result);
+        }
+
+        [HttpDelete("{productId}"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResponse<bool>>> DeleteProduct(int productId)
+        {
+            var result = await _productService.DeleteProduct(productId);
             return Ok(result);
         }
     }

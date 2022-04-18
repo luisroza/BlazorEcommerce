@@ -15,6 +15,7 @@
         public int PageCount { get; set; } = 0;
         public string LastSearchText { get; set; } = string.Empty;
         public List<Product> Products { get; set; } = new List<Product>();
+        public List<Product> AdminProducts { get; set; } = new List<Product>();
 
         public async Task GetProductsAsync(string? categoryUrl = null)
         {
@@ -57,6 +58,33 @@
         {
             var result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/search-suggestions/{searchText}");
             return result.Data;
+        }
+
+        public async Task GetAdminProducts()
+        {
+            var result = await _http.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/product/admin");
+            AdminProducts = result.Data;
+            CurrentPage = 1;
+            PageCount = 0;
+            if (AdminProducts.Count == 0)
+                Message = "No products found.";
+        }
+
+        public async Task<Product?> CreateProduct(Product product)
+        {
+            var result = await _http.PostAsJsonAsync("api/product", product);
+            return (await result.Content.ReadFromJsonAsync<ServiceResponse<Product>>()).Data;
+        }
+
+        public async Task<Product?> UpdateProduct(Product product)
+        {
+            var result = await _http.PutAsJsonAsync("api/product", product);
+            return (await result.Content.ReadFromJsonAsync<ServiceResponse<Product>>()).Data;
+        }
+
+        public async Task DeleteProduct(Product product)
+        {
+            await _http.DeleteAsync($"api/product/{product.Id}");
         }
     }
 }
