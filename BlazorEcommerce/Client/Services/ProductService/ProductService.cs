@@ -54,9 +54,9 @@
             ProductsChanged.Invoke();
         }
 
-        public async Task<List<string>> GetProductSearchSuggestions(string searchText)
+        public async Task<List<string>?> GetProductSearchSuggestions(string searchText)
         {
-            var result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/search-suggestions/{searchText}");
+            ServiceResponse<List<string>?>? result = await _http.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/search-suggestions/{searchText}");
             return result.Data;
         }
 

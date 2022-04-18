@@ -10,7 +10,7 @@
         }
 
         public event Action? OnChange;
-        public List<ProductType> ProductTypes { get; set; } = new List<ProductType>();
+        public List<ProductType>? ProductTypes { get; set; } = new List<ProductType>();
 
         public async Task GetProductTypes()
         {

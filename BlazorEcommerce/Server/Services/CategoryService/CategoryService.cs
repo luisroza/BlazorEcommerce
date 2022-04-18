@@ -94,7 +94,7 @@
             return response;
         }
 
-        private async Task<Category> GetCategoryById(int id)
+        private async Task<Category?> GetCategoryById(int id)
         {
             return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         }

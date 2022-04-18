@@ -15,12 +15,11 @@
     protected override async Task OnInitializedAsync()
     {
         var role = (await _authenticationStateProvider.GetAuthenticationStateAsync())
-            .User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            .User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-        if (role.Contains("Admin"))
+        if (role != null && role.Contains("Admin"))
         {
             _authorized = true;
         }
     }
-
 }

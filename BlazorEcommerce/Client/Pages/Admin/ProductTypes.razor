@@ -60,6 +60,8 @@
 
     private async Task UpdateProductType()
     {
+        if (_editingProductType == null) return;
+
         if (_editingProductType.IsNew)
             await _productTypeService.AddProductType(_editingProductType);
         else

@@ -134,7 +134,10 @@ else
         {
             var dbProduct = (await _productService.GetProductAsync(Id)).Data;
             if (dbProduct == null)
+            {
                 _message = $"Product with ID {Id}' does not exist.";
+                return;
+            }
 
             _product = dbProduct;
             _product.Editing = true;
@@ -145,6 +148,8 @@ else
 
     private async void AddOrUpdateProduct()
     {
+        if (_product == null) return;
+
         if (_product.IsNew)
         {
             var newProduct = await _productService.CreateProduct(_product);
@@ -184,7 +189,7 @@ else
 
     private void AddVariant()
     {
-        _product.Variants.Add(new ProductVariant
+        _product?.Variants.Add(new ProductVariant
         {
             IsNew = true,
             ProductId = _product.Id

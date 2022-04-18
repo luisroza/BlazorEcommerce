@@ -5,7 +5,7 @@
         private readonly HttpClient _http;
         public event Action OnChange;
         public List<Category> Categories { get; set; } = new List<Category>();
-        public List<Category> AdminCategories { get; set; } = new List<Category>();
+        public List<Category>? AdminCategories { get; set; } = new List<Category>();
 
         public CategoryService(HttpClient http)
         {

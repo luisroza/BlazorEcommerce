@@ -89,6 +89,8 @@
 
     private async Task UpdateCategory()
     {
+        if (_editingCategory == null) return;
+
         if (_editingCategory.IsNew)
             await _categoryService.AddCategory(_editingCategory);
         else

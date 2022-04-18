@@ -19,7 +19,7 @@
 
 @code {
     private string _searchText = string.Empty;
-    private List<string> _suggestions = new List<string>();
+    private List<string>? _suggestions = new List<string>();
     protected ElementReference SearchInput;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

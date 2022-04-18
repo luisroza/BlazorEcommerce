@@ -37,7 +37,7 @@
                     TotalPrice = totalPrice,
                     OrderItems = orderItems
                 };
-                _context.Orders!.Add(order);
+                _context.Orders.Add(order);
             }
 
             _context.CartItems!.RemoveRange(_context.CartItems.Where(ci  => ci.UserId == userId));
@@ -75,9 +75,9 @@
         {
             var response = new ServiceResponse<OrderDetailsResponse>();
             var order = await _context.Orders!
-                .Include(o => o.OrderItems)!
+                .Include(o => o.OrderItems)
                 .ThenInclude(o => o.Product)
-                .Include(o => o.OrderItems)!
+                .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.ProductType)
                 .Where(o => o.UserId == _authService.GetUserId() && o.Id == orderId)
                 .OrderByDescending((o => o.OrderDate))
