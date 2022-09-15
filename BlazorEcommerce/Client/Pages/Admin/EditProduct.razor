@@ -30,8 +30,29 @@ else
             <label for="imageUrl">Image Url</label>
             <InputText id="imageUrl" @bind-Value="@_product.ImageUrl" class="form-control"></InputText>
         </div>
+        <div class="mb-0" style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: center">
+            @if (!string.IsNullOrEmpty(_product.ImageUrl))
+            {
+                <img src="@_product.ImageUrl" alt="Product Image" />
+            }
+            else
+            {
+                foreach (var image in _product.Images)
+                {
+                    <MudCard Class="ma-2">
+                        <MudCardContent>
+                            <MudImage Src="@image.Data"></MudImage>
+                        </MudCardContent>
+                        <MudCardActions Style="justify-content: center">
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => RemoveImage(image.Id))">Remove</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                }
+            }
+        </div>
         <div class="mb-0">
-            <img src="@_product.ImageUrl" alt="Product Image"/>
+            <label for="imageUrl">Image(s)</label>
+            <InputFile id="images" OnChange="OnFileChange" multiple class="form-control"></InputFile>
         </div>
         <div class="mb-0">
             <label for="description">Description</label>
@@ -194,5 +215,27 @@ else
             IsNew = true,
             ProductId = _product.Id
         });
+    }
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        const string format = "image/png";
+        foreach (var image in e.GetMultipleFiles(int.MaxValue))
+        {
+            var resizedImage = await image.RequestImageFileAsync(format, 200, 200);
+            var buffer = new byte[resizedImage.Size];
+    @(await resizedImage.OpenReadStream().ReadAsync(buffer))
+            var imageData = $"data:{format}base64, {Convert.ToBase64String(buffer)}";
+
+            _product.Images.Add(new Image {Data = imageData});
+        }
+    }
+
+    private void RemoveImage(int id)
+    {
+        var image = _product.Images.FirstOrDefault(i => i.Id == id);
+
+        if (image != null)
+            _product.Images.Remove(image);
     }
 }

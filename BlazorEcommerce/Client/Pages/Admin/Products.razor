@@ -1,5 +1,4 @@
 ﻿@page "/admin/products"
-@using System.Runtime.InteropServices
 @inject IProductService _productService
 @inject NavigationManager _navigationManager
 @attribute [Authorize(Roles = "Admin")]
@@ -30,7 +29,15 @@ else
         <Virtualize Items="_productService.AdminProducts" Context="product">
             <tr>
                 <td>
-                    <img src="@product.ImageUrl" alt="Product Image" /></td>
+                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl" alt="Product Image"/>
+                    }
+                    else if(product.Images.Count > 0)
+                    {
+                        <img src="@product.Images[0].Data" alt="Product Image"/>
+                    }
+                </td>
                 <td>@product.Title</td>
                 <td>
                     @foreach (var variant in product.Variants)

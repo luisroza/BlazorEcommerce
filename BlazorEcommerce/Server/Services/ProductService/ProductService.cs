@@ -3,11 +3,11 @@
     public class ProductService : IProductService
     {
         private readonly DataContext _context;
-        private readonly HttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public List<Product>? Products { get; set; }
 
-        public ProductService(DataContext context, HttpContextAccessor httpContextAccessor)
+        public ProductService(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -19,6 +19,7 @@
                 Data = await _context.Products!
                     .Where(p => !p.Deleted && p.Visible)
                     .Include(p => p.Variants.Where(v => !v.Deleted && v.Visible))
+                    .Include(p => p.Images)
                     .ToListAsync()
             };
         }
@@ -30,6 +31,7 @@
                 Data = await _context.Products!
                     .Where(p => p.Category!.Url.ToLower().Equals(categoryUrl.ToLower()) && !p.Deleted && p.Visible)
                     .Include(p => p.Variants.Where(v => !v.Deleted && v.Visible))
+                    .Include(p => p.Images)
                     .ToListAsync()
             };
         }
@@ -43,6 +45,7 @@
                 product = await _context.Products!
                     .Include(p => p.Variants.Where(v => !v.Deleted))
                     .ThenInclude(v => v.ProductType)
+                    .Include(p => p.Images)
                     .FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted);
             }
             else
@@ -50,6 +53,7 @@
                 product = await _context.Products!
                     .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted))
                     .ThenInclude(v => v.ProductType)
+                    .Include(p => p.Images)
                     .FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted && p.Visible);
             }
             
@@ -100,6 +104,7 @@
                 Data = await _context.Products!
                     .Where(p => p.Featured && !p.Deleted && p.Visible)
                     .Include(p => p.Variants.Where(v => !v.Deleted && v.Visible))
+                    .Include(p => p.Images)
                     .ToListAsync()
             };
         }
@@ -112,6 +117,7 @@
                     .Where(p => !p.Deleted)
                     .Include(p => p.Variants.Where(v => !v.Deleted))
                     .ThenInclude(v => v.ProductType)
+                    .Include(p => p.Images)
                     .ToListAsync()
             };
         }
@@ -131,7 +137,9 @@
 
         public async Task<ServiceResponse<Product>> UpdateProduct(Product product)
         {
-            var dbProduct = await _context.Products.FindAsync(product.Id);
+            var dbProduct = await _context.Products
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == product.Id);
             if (dbProduct == null)
             {
                 return new ServiceResponse<Product>
@@ -147,6 +155,12 @@
             dbProduct.CategoryId = product.CategoryId;
             dbProduct.Visible = product.Visible;
             dbProduct.Featured = product.Featured;
+
+            //Remove all existing images and then add the new ones
+            var productImages = dbProduct.Images;
+            _context.Images.RemoveRange(productImages);
+
+            dbProduct.Images = product.Images;
 
             foreach (var variant in product.Variants)
             {
@@ -193,12 +207,13 @@
 
         public async Task<ServiceResponse<ProductSearchResult>> SearchProducts(string searchText, int page)
         {
-            var pageResults = 2f;
+            var pageResults = 10f;
             var pageCount = Math.Ceiling((await FindProductBySearchText(searchText)).Count / pageResults);
             var products = await _context.Products!
                 .Where(p => p.Title.ToLower().Contains(searchText.ToLower())
                             || p.Description.ToLower().Contains(searchText.ToLower()) && !p.Deleted && p.Visible)
                 .Include(p => p.Variants)
+                .Include(p => p.Images)
                 .Skip((page - 1) * (int) pageResults).Take((int) pageResults).ToListAsync();
 
             return new ServiceResponse<ProductSearchResult>
