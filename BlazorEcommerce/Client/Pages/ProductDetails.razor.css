@@ -5,7 +5,7 @@
     margin: 0 10px 10px 10px;
 }
 
-.media-ima-wrapper {
+.media-img-wrapper {
     max-height: 500px;
     max-width: 500px;
     text-align: center;
@@ -20,8 +20,7 @@
          max-width: 300px;
     }
 
-    .media-ima-wrapper {
+    .media-img-wrapper {
         width: 100%;
         height: auto;
-    }
-}
+    }}
