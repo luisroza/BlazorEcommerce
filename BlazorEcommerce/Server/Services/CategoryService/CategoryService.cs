@@ -35,7 +35,7 @@
         {
             category.Editing = category.IsNew = false;
             _context.Categories.Add(category);
-            await _context.AddRangeAsync();
+            await _context.SaveChangesAsync();
             return await GetAdminCategories();
         }
 
