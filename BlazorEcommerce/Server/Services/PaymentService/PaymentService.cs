@@ -1,5 +1,6 @@
 ﻿using Stripe;
 using Stripe.Checkout;
+using Microsoft.Extensions.Configuration;
 
 namespace BlazorEcommerce.Server.Services.PaymentService
 {
@@ -8,12 +9,14 @@ namespace BlazorEcommerce.Server.Services.PaymentService
         private readonly ICartService _cartService;
         private readonly IAuthService _authService;
         private readonly IOrderService _orderService;
-        
-        const string secret = "whsec_ba5fb99b39473bc176497f180c73fedf909ed8e5a7797341fb73df1c1a585c3b";
+        private readonly string _webhookSecret;
+        private readonly IConfiguration _configuration;
 
-        public PaymentService(ICartService cartService, IAuthService authService, IOrderService orderService)
+        public PaymentService(ICartService cartService, IAuthService authService, IOrderService orderService, IConfiguration configuration)
         {
-            StripeConfiguration.ApiKey = "sk_test_51KnsawCpfhEkHK7eSQM0zWSSuoVgKgD8XFLZyqSEwdPM4c93VdcBQMX1dymYEPmGPqTKJieiWyK32XTbJZQDXzYh00Y1E4BHPW";
+            _configuration = configuration;
+            StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
+            _webhookSecret = configuration["Stripe:WebhookSecret"] ?? string.Empty;
 
             _cartService = cartService;
             _authService = authService;
@@ -71,7 +74,7 @@ namespace BlazorEcommerce.Server.Services.PaymentService
                 var stripeEvent = EventUtility.ConstructEvent(
                     json,
                     request.Headers["Stripe-Signature"],
-                    secret
+                    _webhookSecret
                 );
 
                 if (stripeEvent.Type == Events.CheckoutSessionCompleted)
